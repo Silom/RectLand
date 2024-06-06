@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Godot;
 
 namespace KingdomInvader
@@ -13,6 +9,7 @@ namespace KingdomInvader
         public int Population;
         public Color Color;
         public Vector2 Size;
+        public Map MapNode;
 
         private CollisionShape2D collisionShape;
         private ColorRect colorRect;
@@ -140,7 +137,8 @@ namespace KingdomInvader
                         // Leave whatever many troops behind
                         var squad = new Squad
                         {
-                            Position = GlobalPosition,
+                            MapNode = MapNode,
+                            Position = dragStart + Position - Size / 2, // counter the centering of the squad in _input
                             Color = Color,
                             Size = Size,
                             Population = Population - leftoverPop,
@@ -155,7 +153,7 @@ namespace KingdomInvader
                         timer.Connect("timeout", new Callable(this, nameof(OnSplitMove)));
 
                         Population = leftoverPop;
-                        GetTree().Root.AddChild(squad);
+                        MapNode.AddChild(squad);
 
                         // Stop dragging
                         dragging = false;

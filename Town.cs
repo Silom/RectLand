@@ -1,10 +1,5 @@
 ﻿using Godot;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KingdomInvader
 {
@@ -17,15 +12,16 @@ namespace KingdomInvader
 
         private Label townLabel;
 
-        public int GowthPerSecond { get; internal set; }
-        public int Population { get; internal set; }
+        public int GowthPerSecond;
+        public int Population;
+        public Map MapNode;
 
         public override void _Ready()
         {
             AddToGroup("town");
-            this.SetProcessInput(true);
-            this.SetProcess(true);
-            this.SetPhysicsProcess(true);
+            SetProcessInput(true);
+            SetProcess(true);
+            SetPhysicsProcess(true);
 
             // Create a new Label and add it as a child of this Town
             townLabel = new Label();
@@ -91,13 +87,14 @@ namespace KingdomInvader
                         // release the army
                         var squad = new Squad()
                         {
+                            MapNode = MapNode,
                             Size = new Vector2(30, 30),
                             Color = Colors.Red,
-                            Position = dragStart,
-                            Destination = GetLocalMousePosition(),
+                            Position = dragStart + Position,
+                            Destination = dropPosition + Position,
                             Population = outgoingPop
                         };
-                        AddChild(squad);
+                        MapNode.AddChild(squad);
                         Population = remainingPop;
                     }
                 }
