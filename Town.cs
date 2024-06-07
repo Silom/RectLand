@@ -5,15 +5,15 @@ namespace KingdomInvader
 {
     public partial class Town : ColorRect
     {
+        public int GowthPerSecond;
+        public int Population;
+        public Player Owner;
+
         private bool dragging = false;
         private Vector2 dragStart;
         private Vector2 dropPosition;
         private double frameCounter;
-
         private Label townLabel;
-
-        public int GowthPerSecond;
-        public int Population;
 
         public override void _Ready()
         {
@@ -22,6 +22,7 @@ namespace KingdomInvader
             SetProcess(true);
             SetPhysicsProcess(true);
 
+            Color = Owner.Color;
             // Create a new Label and add it as a child of this Town
             townLabel = new Label();
             AddChild(townLabel);
@@ -86,8 +87,8 @@ namespace KingdomInvader
                         // release the army
                         var squad = new Squad()
                         {
+                            Owner = Owner,
                             Size = new Vector2(30, 30),
-                            Color = Colors.Red,
                             Position = dragStart + Position,
                             Destination = dropPosition + Position,
                             Population = outgoingPop

@@ -7,7 +7,7 @@ namespace KingdomInvader
     {
         public Vector2 Destination = Vector2.Zero;
         public int Population;
-        public Color Color;
+        public Player Owner;
         public Vector2 Size;
 
         private CollisionShape2D collisionShape;
@@ -41,7 +41,7 @@ namespace KingdomInvader
             colorRect = new ColorRect
             {
                 Size = Size,
-                Color = Color
+                Color = Owner.Color
             };
             AddChild(colorRect);
             AddChild(squadLabel);
@@ -87,13 +87,23 @@ namespace KingdomInvader
 
         private void OnSquadEntered(Area2D area)
         {
-            if (moving && !merged && area is Squad otherSquad && !otherSquad.merged)
+            if (area is Squad otherSquad)
             {
-                // Merge the squads and remove the inactive
-                // If both squads move and collide its a bit random - perhaps we should prevent merging if both squads are moving TODO
-                Population += otherSquad.Population;
-                otherSquad.merged = true;
-                otherSquad.QueueFree();
+                if (moving && !merged && !otherSquad.merged)
+                {
+                    if (otherSquad.Owner != Owner)
+                    {
+                        // Initiate combat
+                        StartCombat(otherSquad);
+                    } else
+                    {
+                        // Merge the squads and remove the inactive
+                        // If both squads move and collide its a bit random - perhaps we should prevent merging if both squads are moving TODO
+                        Population += otherSquad.Population;
+                        otherSquad.merged = true;
+                        otherSquad.QueueFree();
+                    }
+                }
             }
         }
 
@@ -135,8 +145,8 @@ namespace KingdomInvader
                         // Leave whatever many troops behind
                         var squad = new Squad
                         {
-                            Position =  Position,
-                            Color = Color,
+                            Position = Position,
+                            Owner = Owner,
                             Size = Size,
                             Population = Population - leftoverPop,
                         };
@@ -151,14 +161,41 @@ namespace KingdomInvader
 
                         Population = leftoverPop;
                         GameState.MapNode.AddChild(squad);
-
-                        // Stop dragging
                         dragging = false;
                         // Save the drop position
                         Vector2 destination = Position + GetLocalMousePosition() - dragStart;
                         Destination = destination + new Vector2(Size.X / 2, Size.Y / 2);
                     }
                 }
+            }
+        }
+
+        private void StartCombat(Squad otherSquad)
+        {
+            // Reduce the population of both squads by one every second until one squad disappears
+            var combatTimer = new Timer();
+            combatTimer.WaitTime = 1.0f;
+            combatTimer.OneShot = false;
+            AddChild(combatTimer);
+            combatTimer.Start();
+            combatTimer.Connect("timeout", Callable.From(() => OnCombatTick(otherSquad)));
+        }
+
+        private void OnCombatTick(Squad otherSquad)
+        {
+            Population--;
+            otherSquad.Population--;
+
+            if (Population <= 0)
+            {
+                merged = false;
+                QueueFree();
+            }
+
+            if (otherSquad.Population <= 0)
+            {
+                otherSquad.merged = false;
+                otherSquad.QueueFree();
             }
         }
 
