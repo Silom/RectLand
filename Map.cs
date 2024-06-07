@@ -8,7 +8,7 @@ namespace KingdomInvader
     {
         public int sizeX;
         public int sizeY;
-        
+
         private List<Town> towns { get; set; } = new List<Town>();
         private List<Player> players { get; set; } = new List<Player>();
 
@@ -38,7 +38,7 @@ namespace KingdomInvader
 
             var town = new Town()
             {
-                Owner = player,
+                PlayerOwner = player,
                 Position = new Vector2(100, 100),
                 Size = new Vector2(100, 100),
                 GowthPerSecond = 1,
@@ -47,7 +47,7 @@ namespace KingdomInvader
 
             var townEnemy = new Town()
             {
-                Owner = playerEnemy,
+                PlayerOwner = playerEnemy,
                 Position = new Vector2(400, 400),
                 Size = new Vector2(100, 100),
                 GowthPerSecond = 1,
@@ -56,7 +56,7 @@ namespace KingdomInvader
 
             var townNeutral = new Town()
             {
-                Owner = playerNeutral,
+                PlayerOwner = playerNeutral,
                 Position = new Vector2(200, 400),
                 Size = new Vector2(100, 100),
                 GowthPerSecond = 1,

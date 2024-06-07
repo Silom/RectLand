@@ -1,5 +1,5 @@
-﻿using System;
-using Godot;
+﻿using Godot;
+using System;
 
 namespace KingdomInvader
 {
@@ -7,7 +7,7 @@ namespace KingdomInvader
     {
         public Vector2 Destination = Vector2.Zero;
         public int Population;
-        public Player Owner;
+        public Player PlayerOwner;
         public Vector2 Size;
 
         private CollisionShape2D collisionShape;
@@ -41,7 +41,7 @@ namespace KingdomInvader
             colorRect = new ColorRect
             {
                 Size = Size,
-                Color = Owner.Color
+                Color = PlayerOwner.Color
             };
             AddChild(colorRect);
             AddChild(squadLabel);
@@ -91,11 +91,12 @@ namespace KingdomInvader
             {
                 if (moving && !merged && !otherSquad.merged)
                 {
-                    if (otherSquad.Owner != Owner)
+                    if (otherSquad.PlayerOwner != PlayerOwner)
                     {
                         // Initiate combat
                         StartCombat(otherSquad);
-                    } else
+                    }
+                    else
                     {
                         // Merge the squads and remove the inactive
                         // If both squads move and collide its a bit random - perhaps we should prevent merging if both squads are moving TODO
@@ -146,7 +147,7 @@ namespace KingdomInvader
                         var squad = new Squad
                         {
                             Position = Position,
-                            Owner = Owner,
+                            PlayerOwner = PlayerOwner,
                             Size = Size,
                             Population = Population - leftoverPop,
                         };

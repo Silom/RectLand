@@ -7,7 +7,7 @@ namespace KingdomInvader
     {
         public int GowthPerSecond;
         public int Population;
-        public Player Owner;
+        public Player PlayerOwner;
 
         private bool dragging = false;
         private Vector2 dragStart;
@@ -22,7 +22,7 @@ namespace KingdomInvader
             SetProcess(true);
             SetPhysicsProcess(true);
 
-            Color = Owner.Color;
+            Color = PlayerOwner.Color;
             // Create a new Label and add it as a child of this Town
             townLabel = new Label();
             AddChild(townLabel);
@@ -87,7 +87,7 @@ namespace KingdomInvader
                         // release the army
                         var squad = new Squad()
                         {
-                            Owner = Owner,
+                            PlayerOwner = PlayerOwner,
                             Size = new Vector2(30, 30),
                             Position = dragStart + Position,
                             Destination = dropPosition + Position,
