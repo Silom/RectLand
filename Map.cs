@@ -18,7 +18,6 @@ namespace KingdomInvader
 
             var town = new Town()
             {
-                MapNode = this,
                 Color = Colors.Pink,
                 Position = new Vector2(200, 200),
                 Size = new Vector2(100, 100),

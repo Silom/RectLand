@@ -9,7 +9,6 @@ namespace KingdomInvader
         public int Population;
         public Color Color;
         public Vector2 Size;
-        public Map MapNode;
 
         private CollisionShape2D collisionShape;
         private ColorRect colorRect;
@@ -84,7 +83,6 @@ namespace KingdomInvader
                     Position = Destination - new Vector2(Size.X / 2, Size.Y / 2);
                 }
             }
-            
         }
 
         private void OnSquadEntered(Area2D area)
@@ -137,8 +135,7 @@ namespace KingdomInvader
                         // Leave whatever many troops behind
                         var squad = new Squad
                         {
-                            MapNode = MapNode,
-                            Position = dragStart + Position - Size / 2, // counter the centering of the squad in _input
+                            Position =  Position,
                             Color = Color,
                             Size = Size,
                             Population = Population - leftoverPop,
@@ -153,7 +150,7 @@ namespace KingdomInvader
                         timer.Connect("timeout", new Callable(this, nameof(OnSplitMove)));
 
                         Population = leftoverPop;
-                        MapNode.AddChild(squad);
+                        GameState.MapNode.AddChild(squad);
 
                         // Stop dragging
                         dragging = false;

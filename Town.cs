@@ -14,7 +14,6 @@ namespace KingdomInvader
 
         public int GowthPerSecond;
         public int Population;
-        public Map MapNode;
 
         public override void _Ready()
         {
@@ -87,14 +86,13 @@ namespace KingdomInvader
                         // release the army
                         var squad = new Squad()
                         {
-                            MapNode = MapNode,
                             Size = new Vector2(30, 30),
                             Color = Colors.Red,
                             Position = dragStart + Position,
                             Destination = dropPosition + Position,
                             Population = outgoingPop
                         };
-                        MapNode.AddChild(squad);
+                        GameState.MapNode.AddChild(squad);
                         Population = remainingPop;
                     }
                 }

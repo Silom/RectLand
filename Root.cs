@@ -69,6 +69,7 @@ namespace KingdomInvader
         {
             currentMap = new Map();
             AddChild(currentMap);
+            GameState.MapNode = currentMap;
         }
 
         private void InitializeIngameUI()
