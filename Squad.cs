@@ -6,8 +6,10 @@ namespace KingdomInvader
     public partial class Squad : Area2D
     {
         public Vector2 Destination = Vector2.Zero;
+        public bool MovementBlocked = false;
         public int Population;
         public Player PlayerOwner;
+        public Combat InvolvedCombat;
         public Vector2 Size;
 
         private CollisionShape2D collisionShape;
@@ -91,7 +93,12 @@ namespace KingdomInvader
             {
                 if (moving && !merged && !otherSquad.merged)
                 {
-                    if (otherSquad.PlayerOwner != PlayerOwner)
+                    if (otherSquad.InvolvedCombat != null)
+                    {
+                        InvolvedCombat = otherSquad.InvolvedCombat;
+                        InvolvedCombat.JoinCombat(this);
+                    }
+                    else if (otherSquad.PlayerOwner != PlayerOwner)
                     {
                         // Initiate combat
                         StartCombat(otherSquad);
@@ -110,6 +117,11 @@ namespace KingdomInvader
 
         public override void _Input(InputEvent @event)
         {
+            if (MovementBlocked)
+            {
+                return;
+            }
+
             if (@event is InputEventMouseButton mouseButtonEvent)
             {
                 if (mouseButtonEvent.Pressed && mouseButtonEvent.ButtonIndex == MouseButton.Left)
@@ -173,31 +185,21 @@ namespace KingdomInvader
 
         private void StartCombat(Squad otherSquad)
         {
-            // Reduce the population of both squads by one every second until one squad disappears
-            var combatTimer = new Timer();
-            combatTimer.WaitTime = 1.0f;
-            combatTimer.OneShot = false;
-            AddChild(combatTimer);
-            combatTimer.Start();
-            combatTimer.Connect("timeout", Callable.From(() => OnCombatTick(otherSquad)));
-        }
-
-        private void OnCombatTick(Squad otherSquad)
-        {
-            Population--;
-            otherSquad.Population--;
-
-            if (Population <= 0)
+            GD.PushError("Squad entered meele Combat");
+            if (otherSquad.InvolvedCombat != null)
             {
-                merged = false;
-                QueueFree();
+                InvolvedCombat = otherSquad.InvolvedCombat;
+            }
+            else
+            {
+                InvolvedCombat = new Combat()
+                {
+                    Squads = new System.Collections.Generic.List<Squad> { this, otherSquad }
+                };
+                GameState.MapNode.AddChild(InvolvedCombat);
+                otherSquad.InvolvedCombat = InvolvedCombat;
             }
 
-            if (otherSquad.Population <= 0)
-            {
-                otherSquad.merged = false;
-                otherSquad.QueueFree();
-            }
         }
 
         private void OnSplitMove()

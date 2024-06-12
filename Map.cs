@@ -29,7 +29,7 @@ namespace KingdomInvader
 
             var playerNeutral = new Player()
             {
-                Color = Colors.Green
+                Color = Colors.DarkGreen
             };
 
             players.Add(player);
@@ -42,7 +42,7 @@ namespace KingdomInvader
                 Position = new Vector2(100, 100),
                 Size = new Vector2(100, 100),
                 GowthPerSecond = 1,
-                Population = 100
+                Population = 10
             };
 
             var townEnemy = new Town()
@@ -51,7 +51,7 @@ namespace KingdomInvader
                 Position = new Vector2(400, 400),
                 Size = new Vector2(100, 100),
                 GowthPerSecond = 1,
-                Population = 100
+                Population = 10
             };
 
             var townNeutral = new Town()
@@ -60,7 +60,7 @@ namespace KingdomInvader
                 Position = new Vector2(200, 400),
                 Size = new Vector2(100, 100),
                 GowthPerSecond = 1,
-                Population = 100
+                Population = 10
             };
 
             AddChild(town);
