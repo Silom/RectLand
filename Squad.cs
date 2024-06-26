@@ -10,8 +10,7 @@ namespace KingdomInvader
         public int Population;
         public Player PlayerOwner;
         public Combat InvolvedCombat;
-        public Vector2 Size;
-
+        public Vector2 Size = new Vector2(30, 30);
         private CollisionShape2D collisionShape;
         private ColorRect colorRect;
         private float speed = 100; // pixels per second
@@ -21,9 +20,14 @@ namespace KingdomInvader
         private Vector2 dragStart;
         private bool merged = false;
 
+        private Node2D animatedSpriteContainer;
+
         public override void _Ready()
         {
             AddToGroup("squad");
+
+            var newSize = CalculateRectSize();
+            Size = new Vector2(newSize, newSize);
 
             collisionShape = new CollisionShape2D();
             AddChild(collisionShape);
@@ -39,7 +43,7 @@ namespace KingdomInvader
             moving = true;
 
             squadLabel = new Label();
-
+            squadLabel.Position += new Vector2(0, -30);
             colorRect = new ColorRect
             {
                 Size = Size,
@@ -48,11 +52,42 @@ namespace KingdomInvader
             AddChild(colorRect);
             AddChild(squadLabel);
 
+            animatedSpriteContainer = (Node2D)ResourceLoader.Load<PackedScene>("res://AnimatedSprite.tscn").Instantiate();
+
+            int rows = (int)Math.Ceiling(Math.Sqrt(Population));
+            int columns = (int)Math.Ceiling((double)Population / rows);
+            float spacing = Math.Min(Size.X / columns, Size.Y / rows);
+
+            for (int i = 0; i < Population; i++)
+            {
+                var sprite = (Node2D)animatedSpriteContainer.Duplicate();// TODO Full dup so we only have to animate one sprite
+                int row = i / columns;
+                int column = i % columns;
+                sprite.Position = new Vector2(Size.X / 2 - (columns / 2 - column) * spacing, Size.Y / 2 - (rows / 2 - row) * spacing);
+                AddChild(sprite);
+            }
+
+            animatedSpriteContainer.Position = new Vector2(Size.X / 2, Size.Y / 2);
+
             Connect("area_entered", new Callable(this, nameof(OnSquadEntered)));
         }
 
         public override void _Process(double delta)
         {
+            var animatedSprite = (AnimatedSprite2D)animatedSpriteContainer.FindChild("AnimatedSprite");
+            if (animatedSprite != null)
+            {
+                if (moving)
+                {
+                    animatedSprite.Play("walk_down");
+                }
+                else
+                {
+                    animatedSprite.Stop();
+                }
+            }
+
+
             squadLabel.Text = $"{Population}";
             QueueRedraw();
         }
@@ -85,10 +120,39 @@ namespace KingdomInvader
                     Position = Destination - new Vector2(Size.X / 2, Size.Y / 2);
                 }
             }
+            ApplyRectSize();
+        }
+
+        private int CalculateRectSize()
+        {
+            double sizeRatio = (double)Population / (double)GameSettings.TownMaxPopulation;// adjust size of army to relative to size of town
+            double newSize = GameSettings.SquadMaxSize * sizeRatio;
+
+            if (GameSettings.SquadMinSize > newSize)
+            {
+                return GameSettings.SquadMinSize;
+            }
+            if (GameSettings.SquadMaxSize < newSize)
+            {
+                return GameSettings.SquadMaxSize;
+            }
+            return (int)newSize;
+        }
+
+        // maintain the collision shape as well as the rect area
+        private void ApplyRectSize()
+        {
+            var newSize = CalculateRectSize();
+            Size = new Vector2(newSize, newSize);
+            collisionShape.Shape = new RectangleShape2D { Size = Size };
+            colorRect.Size = Size;
         }
 
         private void OnSquadEntered(Area2D area)
         {
+            GD.PushError("Squad entered Area");
+            GD.PushError(area);
+
             if (area is Squad otherSquad)
             {
                 if (moving && !merged && !otherSquad.merged)
@@ -160,7 +224,6 @@ namespace KingdomInvader
                         {
                             Position = Position,
                             PlayerOwner = PlayerOwner,
-                            Size = Size,
                             Population = Population - leftoverPop,
                         };
                         merged = true;
@@ -185,10 +248,13 @@ namespace KingdomInvader
 
         private void StartCombat(Squad otherSquad)
         {
-            GD.PushError("Squad entered meele Combat");
             if (otherSquad.InvolvedCombat != null)
             {
                 InvolvedCombat = otherSquad.InvolvedCombat;
+            }
+            else if (InvolvedCombat != null)
+            {
+                otherSquad.InvolvedCombat = InvolvedCombat;
             }
             else
             {

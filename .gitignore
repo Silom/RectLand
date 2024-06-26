@@ -1,5 +1,12 @@
+
+.godot/
+data.db
+data.db-shm
+data.db-wal
+
 # Rider
 .idea/
+
 
 # Visual Studio Code
 .vscode/

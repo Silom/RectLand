@@ -55,7 +55,7 @@ namespace KingdomInvader
         public void JoinCombat(Squad squad)
         {
             // Squad has joined the combat after inital start
-            if (CombatHasStarted)
+            if (CombatHasStarted && Squads.FirstOrDefault(s => squad == s) == null)
             {
                 GD.PushError("Squad entered melee Combat");
                 Squads.Add(squad);
@@ -84,6 +84,10 @@ namespace KingdomInvader
             {
                 squad.MovementBlocked = false;
                 squad.InvolvedCombat = null;
+                if (squad.Population <= 0)
+                {
+                    squad.QueueFree();
+                }
             }
             QueueFree();
         }
@@ -96,14 +100,10 @@ namespace KingdomInvader
         {
             var squadToBeCleared = new List<Squad>();
             var playersHadTurn = new List<Player>();// for now we use this so per tick everyone does dmg once
-
-            foreach (var squad in Squads)
+            var fullSquads = Squads.FindAll(s => s.Population > 0);
+            GD.PushError(fullSquads.Count);
+            foreach (var squad in fullSquads)
             {
-                GD.PushError(squad, Squads);
-                if (squad == null || squad.Population <= 0)
-                {
-                    continue;
-                }
                 if (playersHadTurn.FirstOrDefault(s => s == squad.PlayerOwner) == null)
                 {
                     playersHadTurn.Add(squad.PlayerOwner);
@@ -114,8 +114,11 @@ namespace KingdomInvader
                         // target may equal null if we have no more enemies
                         if (target.Population <= 0)
                         {
+                            // TODO there should be a better way
+                            //Squads.Remove(target);
                             //target.QueueFree();
-                            RemoveChild(target);
+                            //RemoveChild(target);
+                            target.Visible = false;
                         }
                     }
 
@@ -132,9 +135,9 @@ namespace KingdomInvader
                     squad.Destination = new Vector2(x, y);
                 }
             }
-
+            GD.PushError(Squads.FindAll(s => s.Population > 0).Count);
             // TODO or if no other player involved
-            if (Squads.Count <= 1 || FindRandomEnemySquad(Squads[0]) == null)
+            if (Squads.FindAll(s => s.Visible).Count <= 1)
             {
                 ResolveCombat();
             }

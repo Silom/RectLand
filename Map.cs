@@ -42,7 +42,7 @@ namespace KingdomInvader
                 Position = new Vector2(100, 100),
                 Size = new Vector2(100, 100),
                 GowthPerSecond = 1,
-                Population = 10
+                Population = 1000
             };
 
             var townEnemy = new Town()
@@ -51,7 +51,7 @@ namespace KingdomInvader
                 Position = new Vector2(400, 400),
                 Size = new Vector2(100, 100),
                 GowthPerSecond = 1,
-                Population = 10
+                Population = 1000
             };
 
             var townNeutral = new Town()

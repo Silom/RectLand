@@ -1,9 +1,11 @@
 using Godot;
+using KingdomInvader.Models;
 
 namespace KingdomInvader
 {
     public partial class Root : Node2D
     {
+        GameContext context = new GameContext();
         private Control uiControl;
         private HSlider slider;
         private Label sliderLabel;
@@ -12,6 +14,7 @@ namespace KingdomInvader
 
         public override void _Ready()
         {
+
             SetProcessInput(true);
             SetProcess(true);
 

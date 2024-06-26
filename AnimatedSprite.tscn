@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3 uid="uid://e51bapfxaxix"]
+
+[ext_resource type="Texture2D" uid="uid://djewse8vfrs26" path="res://Assets/CharactersSprite.png" id="1_8f8aw"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ocwq7"]
+atlas = ExtResource("1_8f8aw")
+region = Rect2(64, 216, 16, 24)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ktexn"]
+atlas = ExtResource("1_8f8aw")
+region = Rect2(64, 264, 16, 24)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6hkeb"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ocwq7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ktexn")
+}],
+"loop": true,
+"name": &"walk_down",
+"speed": 5.0
+}]
+
+[node name="Node" type="Node2D"]
+
+[node name="CharacterModel2D" type="CharacterBody2D" parent="."]
+motion_mode = 1
+
+[node name="AnimatedSprite" type="AnimatedSprite2D" parent="CharacterModel2D"]
+sprite_frames = SubResource("SpriteFrames_6hkeb")
+animation = &"walk_down"
+frame_progress = 0.0817493
